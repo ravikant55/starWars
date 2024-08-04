@@ -2,6 +2,7 @@ package com.example.starwars.screens
 
 import android.os.Build
 import androidx.annotation.RequiresExtension
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,6 +24,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -54,7 +56,8 @@ fun MatchesScreen(name: String, id: Int, navController: NavHostController) {
         when (val playersUiState = viewModel.playersUiState) {
             is PlayersUiState.Loading -> LoadingScreen(/*modifier = modifier.fillMaxSize()*/)
             is PlayersUiState.Success -> MatchesItem(
-                viewModel, id
+                viewModel,
+                id
             )
 
             is PlayersUiState.Error -> ErrorScreen(
@@ -69,27 +72,32 @@ fun MatchesScreen(name: String, id: Int, navController: NavHostController) {
 private fun MatchesItem(viewModel: PlayerViewModel, id: Int) {
 
     val filteredMatches = viewModel.getMatchesForPlayerId(id)
-    
+
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
         items(filteredMatches.toList()) { match ->
-            MatchItem(match = match)
+            val color = viewModel.getScoreColorForPlayer(match, id)
+            MatchItem(match = match, color)
         }
     }
 }
 
 @Composable
-private fun MatchItem(match: MatchDataItem) {
+private fun MatchItem(match: MatchDataItem, color: Color) {
     Card(
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
+
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = color)
+                .padding(16.dp)
         ) {
             match.player1?.id.toString().let {
                 Text(text = it)

@@ -16,6 +16,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import com.example.starwars.data.MatchDataItem
 import com.example.starwars.data.MatchesData
 import com.example.starwars.data.PlayersData
@@ -71,7 +72,21 @@ class PlayerViewModel @Inject constructor(
     // Function to get filtered matches based on player id
     fun getMatchesForPlayerId(id: Int): List<MatchDataItem> {
         return allMatches.filter { match ->
-            match.player1?.id == id || match.player2?.id == id
+            match.player1?.score == id || match.player2?.id == id
+        }
+    }
+
+    // Function to get score color for a player in a match
+    fun getScoreColorForPlayer(match: MatchDataItem, playerId: Int): Color {
+        val player1Score = match.player1?.score ?: 0
+        val player2Score = match.player2?.score ?: 0
+
+        return when {
+            playerId == match.player1?.id && player1Score > player2Score -> Color.Green
+            playerId == match.player1?.id && player1Score < player2Score -> Color.Red
+            playerId == match.player2?.id && player2Score > player1Score -> Color.Green
+            playerId == match.player2?.id && player2Score < player1Score -> Color.Red
+            else -> Color.White
         }
     }
 }
