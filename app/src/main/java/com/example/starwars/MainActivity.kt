@@ -14,6 +14,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.example.starwars.navigation.AppNavHost
@@ -49,4 +50,29 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+
+/*@RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MyScaffold(
+    title: String,
+    content: @Composable (Modifier) -> Unit
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(text = title) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = Color.White
+                )
+            )
+        }
+    ) { padding ->
+        Box(modifier = Modifier.padding(padding)) {
+            AppNavHost()
+        }
+    }
+}*/
 

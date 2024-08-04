@@ -33,6 +33,7 @@ import com.example.starwars.viewmodel.PlayersUiState
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
 fun PlayersScreen(navController: NavHostController) {
+
     val viewModel: PlayerViewModel = hiltViewModel()
     when (val playersUiState = viewModel.playersUiState) {
         is PlayersUiState.Loading -> LoadingScreen(/*modifier = modifier.fillMaxSize()*/)
@@ -50,6 +51,7 @@ fun PlayersScreen(navController: NavHostController) {
 @Composable
 fun PlayersItem(players: PlayersData,  navController: NavHostController) {
     Log.i("Tag", "PlayersScreen: ${players[0].icon}")
+
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {

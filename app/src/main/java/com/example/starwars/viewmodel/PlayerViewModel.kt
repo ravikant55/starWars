@@ -12,15 +12,18 @@ import android.net.http.HttpException
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresExtension
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.example.starwars.data.MatchesData
 import com.example.starwars.data.PlayersData
+import com.example.starwars.repositiries.RepositoryMatchList
 import com.example.starwars.repositiries.RepositoryPlayerList
 import java.io.IOException
 
 sealed interface PlayersUiState {
-    data class Success(val playersData: PlayersData) : PlayersUiState
+    data class Success(val playersData: PlayersData, val matchesData: MatchesData) : PlayersUiState
     object Error : PlayersUiState
     object Loading : PlayersUiState
 }
@@ -28,11 +31,13 @@ sealed interface PlayersUiState {
 @HiltViewModel
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 class PlayerViewModel @Inject constructor(
-    private val repository: RepositoryPlayerList
+    private val playersRepository: RepositoryPlayerList,
+    private val matchesRepository: RepositoryMatchList
 ) : ViewModel() {
 
-    var playersUiState: PlayersUiState by mutableStateOf(PlayersUiState.Loading)
-        private set
+    // Using MutableState to encapsulate state management
+    private val _playersUiState: MutableState<PlayersUiState> = mutableStateOf(PlayersUiState.Loading)
+    val playersUiState: PlayersUiState by _playersUiState
 
     init {
         fetchGames()
@@ -40,18 +45,16 @@ class PlayerViewModel @Inject constructor(
 
     private fun fetchGames() {
         viewModelScope.launch {
-            playersUiState = PlayersUiState.Loading
-            playersUiState = try {
-                Log.i("TAG", "fetchGames: b4 success")
-                PlayersUiState.Success(repository.getPlayersList())
+            _playersUiState.value = PlayersUiState.Loading
+            try {
+                val playersData = playersRepository.getPlayersList()
+                val matchesData = matchesRepository.getMatchesList()
+                _playersUiState.value = PlayersUiState.Success(playersData, matchesData)
             } catch (e: IOException) {
-                Log.i("TAG", "fetchGames IOException: $e")
-                PlayersUiState.Error
+                _playersUiState.value = PlayersUiState.Error
             } catch (e: HttpException) {
-                Log.i("TAG", "fetchGames HttpException: $e")
-                PlayersUiState.Error
+                _playersUiState.value = PlayersUiState.Error
             }
-            Log.i("TAG", "fetchGames: ${playersUiState.toString()}")
         }
     }
 }
