@@ -16,6 +16,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.example.starwars.data.MatchDataItem
 import com.example.starwars.data.MatchesData
 import com.example.starwars.data.PlayersData
 import com.example.starwars.repositiries.RepositoryMatchList
@@ -39,6 +40,9 @@ class PlayerViewModel @Inject constructor(
     private val _playersUiState: MutableState<PlayersUiState> = mutableStateOf(PlayersUiState.Loading)
     val playersUiState: PlayersUiState by _playersUiState
 
+    // Cached list of all matches
+    private var allMatches: List<MatchDataItem> = emptyList()
+
     init {
         fetchGames()
     }
@@ -47,8 +51,14 @@ class PlayerViewModel @Inject constructor(
         viewModelScope.launch {
             _playersUiState.value = PlayersUiState.Loading
             try {
+                // Fetch players and matches data
                 val playersData = playersRepository.getPlayersList()
                 val matchesData = matchesRepository.getMatchesList()
+
+                // Cache all matches for filtering
+                allMatches = matchesData
+
+                // Update UI state with success
                 _playersUiState.value = PlayersUiState.Success(playersData, matchesData)
             } catch (e: IOException) {
                 _playersUiState.value = PlayersUiState.Error
@@ -57,4 +67,13 @@ class PlayerViewModel @Inject constructor(
             }
         }
     }
+
+    // Function to get filtered matches based on player id
+    fun getMatchesForPlayerId(id: Int): List<MatchDataItem> {
+        return allMatches.filter { match ->
+            match.player1?.id == id || match.player2?.id == id
+        }
+    }
 }
+
+

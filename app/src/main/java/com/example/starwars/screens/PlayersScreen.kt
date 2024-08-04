@@ -49,9 +49,7 @@ fun PlayersScreen(navController: NavHostController) {
 }
 
 @Composable
-fun PlayersItem(players: PlayersData,  navController: NavHostController) {
-    Log.i("Tag", "PlayersScreen: ${players[0].icon}")
-
+private fun PlayersItem(players: PlayersData,  navController: NavHostController) {
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -62,14 +60,14 @@ fun PlayersItem(players: PlayersData,  navController: NavHostController) {
 }
 
 @Composable
-fun PlayerItem(player: PlayersDataItem, navController: NavHostController) {
+private fun PlayerItem(player: PlayersDataItem, navController: NavHostController) {
     Card(
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
             .clickable {
-                navController.navigate("Matches/${player.name}")
+                navController.navigate("Matches/${player.name}/${player.id}")
             } // Pass player name as argument
     ) {
         Row(

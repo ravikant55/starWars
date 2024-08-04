@@ -35,13 +35,20 @@ fun AppNavHost() {
             PlayersScreen(navController = navController)
         }
         composable(
-            "Matches/{name}",
-            arguments = listOf(navArgument("name") { type = NavType.StringType }),
+            "Matches/{name}/{id}",
+            arguments = listOf(
+                navArgument("name") { type = NavType.StringType },
+                navArgument("id") {type = NavType.IntType }
+            ),
             deepLinks = listOf(navDeepLink {
-                uriPattern = "android-app://androidx.navigation/Matches/{name}"
+                uriPattern = "android-app://androidx.navigation/Matches/{name}/{id}"
             })
         ) { backStackEntry ->
-            MatchesScreen(name = backStackEntry.arguments?.getString("name") ?: "", navController)
+            MatchesScreen(
+                name = backStackEntry.arguments?.getString("name") ?: "",
+                id = backStackEntry.arguments?.getInt("id") ?: -1,
+                navController
+            )
         }
     }
 }
