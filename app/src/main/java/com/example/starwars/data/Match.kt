@@ -6,7 +6,6 @@ data class Match(
     val player2: PlayerScore
 )
 
-
 data class PlayerScore(
     val id: Int,
     val score: Int

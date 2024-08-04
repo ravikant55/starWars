@@ -4,6 +4,7 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresExtension
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.starwars.R
@@ -30,12 +32,13 @@ import com.example.starwars.viewmodel.PlayersUiState
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
-fun PlayerList() {
+fun PlayersScreen(navController: NavHostController) {
     val viewModel: PlayerViewModel = hiltViewModel()
     when (val playersUiState = viewModel.playersUiState) {
         is PlayersUiState.Loading -> LoadingScreen(/*modifier = modifier.fillMaxSize()*/)
-        is PlayersUiState.Success -> PlayersScreen(
-            playersUiState.playersData
+        is PlayersUiState.Success -> PlayersItem(
+            playersUiState.playersData,
+            navController
         )
 
         is PlayersUiState.Error -> ErrorScreen(
@@ -45,24 +48,27 @@ fun PlayerList() {
 }
 
 @Composable
-fun PlayersScreen(players: PlayersData) {
+fun PlayersItem(players: PlayersData,  navController: NavHostController) {
     Log.i("Tag", "PlayersScreen: ${players[0].icon}")
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
         items(players.toList()) { player ->
-            PlayerItem(player = player)
+            PlayerItem(player = player, navController)
         }
     }
 }
 
 @Composable
-fun PlayerItem(player: PlayersDataItem) {
+fun PlayerItem(player: PlayersDataItem, navController: NavHostController) {
     Card(
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
+            .clickable {
+                navController.navigate("Matches/${player.name}")
+            } // Pass player name as argument
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

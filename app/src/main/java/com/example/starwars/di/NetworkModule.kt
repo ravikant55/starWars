@@ -17,8 +17,31 @@ import javax.net.ssl.*
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
+    private const val BASE_URL = "https://jsonkeeper.com/b/"
 
-    fun getUnsafeOkHttpClient(): OkHttpClient {
+    @Provides
+    @Singleton
+    fun provideRetrofit(): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(getUnsafeOkHttpClient())
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun providePlayerService(retrofit: Retrofit): PlayerService {
+        return retrofit.create(PlayerService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideMatchService(retrofit: Retrofit): MatchService {
+        return retrofit.create(MatchService::class.java)
+    }
+
+    private fun getUnsafeOkHttpClient(): OkHttpClient {
         return try {
             // Create a trust manager that does not validate certificate chains
             val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
@@ -44,29 +67,5 @@ object NetworkModule {
         } catch (e: Exception) {
             throw RuntimeException(e)
         }
-    }
-
-    private const val BASE_URL = "https://jsonkeeper.com/b/"
-
-    @Provides
-    @Singleton
-    fun provideRetrofit(): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .client(getUnsafeOkHttpClient())
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
-
-    @Provides
-    @Singleton
-    fun providePlayerService(retrofit: Retrofit): PlayerService {
-        return retrofit.create(PlayerService::class.java)
-    }
-
-    @Provides
-    @Singleton
-    fun provideMatchService(retrofit: Retrofit): MatchService {
-        return retrofit.create(MatchService::class.java)
     }
 }
